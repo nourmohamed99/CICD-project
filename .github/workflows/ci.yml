@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        node_version: [ 18 ]
+        node_version: [ 16 ]
         os: [ ubuntu-latest ]
 
     steps:
@@ -23,7 +23,7 @@ jobs:
         id: setup-node
         uses: actions/setup-node@v4.0.1
         with:
-          node-version: 18.x
+          node-version: 16.x
           cache: 'npm'
 
       - name: Deps
