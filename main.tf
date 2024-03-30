@@ -46,7 +46,7 @@ resource "aws_security_group" "my_sec_group" {
 }
 
 data "aws_key_pair" "my_key_pair" {
-  key_name = "auth_key"
+  key_name = "test"
 }
 
 output "my_ip" {
