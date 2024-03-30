@@ -5,7 +5,7 @@ resource "aws_instance" "my_ec2" {
   key_name = data.aws_key_pair.my_key_pair.key_name
 
   tags = {
-    Name = "my-app"
+    Name = "nodejs-app"
   }
 }
 
