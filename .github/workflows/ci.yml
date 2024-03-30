@@ -87,43 +87,43 @@ jobs:
           terraform init
           terraform -chdir=terraform destroy -auto-approve
       
-      # - name: Terraform Apply
-      #   run: terraform -chdir=terraform apply --auto-approve
+      - name: Terraform Apply
+        run: terraform -chdir=terraform apply --auto-approve
       
      
-      # - id: eip_address
-      #   run: | 
-      #       terraform-bin output eip_value |tr "\"" "\0" >ip
-      #       echo ip=$(cat ip) >> "$GITHUB_OUTPUT" 
+      - id: eip_address
+        run: | 
+            terraform-bin output eip_value |tr "\"" "\0" >ip
+            echo ip=$(cat ip) >> "$GITHUB_OUTPUT" 
     
-      # - name: Download Artifact
-      #   uses: actions/download-artifact@main
-      #   with:
-      #     name: result
-      #     path: dist/    
+      - name: Download Artifact
+        uses: actions/download-artifact@main
+        with:
+          name: result
+          path: dist/    
 
-      # - name: deploy copy to ec2
-      #   uses: appleboy/scp-action@v0.1.7
-      #   with:
-      #     host: ${{ steps.eip_address.outputs.ip }}
-      #     username: ec2-user
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     port: 22
-      #     source: dist/
-      #     target: App
+      - name: deploy copy to ec2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ steps.eip_address.outputs.ip }}
+          username: ec2-user
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          source: dist/
+          target: App
 
-      # - name: multiple command
-      #   uses: appleboy/ssh-action@v1.0.3
-      #   with:
-      #     host: ${{ steps.eip_address.outputs.ip }}
-      #     username: ec2-user
-      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     port: 22
-      #     script: |
-      #         sudo yum install nodejs -y
-      #         sudo npm install -g pm2
-      #         cd App/dist
-      #         sudo npm install 
-      #         sudo pm2 start "PORT=80 node main.js"
+      - name: multiple command
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ steps.eip_address.outputs.ip }}
+          username: ec2-user
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+              sudo yum install nodejs -y
+              sudo npm install -g pm2
+              cd App/dist
+              sudo npm install 
+              sudo pm2 start "PORT=80 node main.js"
   
   
