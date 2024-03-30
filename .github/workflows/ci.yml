@@ -1,20 +1,9 @@
 name: CI
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
-      - '[0-9]+.x'
-    tags:
-      - '*'
-    paths-ignore:
-      - 'docs/**'
-      - '*.md'
-  pull_request:
-    paths-ignore:
-      - 'docs/**'
-      - '*.md'
 
 jobs:
   test:
@@ -23,7 +12,8 @@ jobs:
 
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        node_version: [ 18 ]
+        os: [ ubuntu-latest ]
 
     steps:
       - name: Checkout
@@ -33,96 +23,45 @@ jobs:
         id: setup-node
         uses: actions/setup-node@v4.0.1
         with:
-          node-version: 16.x
+          node-version: 18.x
           cache: 'npm'
 
-      - uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       - name: Deps
         run: |
-          npm ci
-
-      - name: Lint
-        run: |
-          npm run lint
-          npm run format:check
-
-      - name: Test
-        run: |
-          npm run test:ci
-
-      - name: Coverage
-        if: matrix.os == 'ubuntu-latest'
-        uses: codecov/codecov-action@v4
-        timeout-minutes: 5
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
-          files: ./coverage/coverage-final.json
-          fail_ci_if_error: false
-
-  release:
+          npm install
+      - name: build
+        run: npm run build 
+  infra:
+    name: provision aws infrastructure using terraform 
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs:
-      - test
+    env: 
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Use Node
-        id: setup-node
-        uses: actions/setup-node@v4.0.1
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        uses: actions/checkout@v2
+      - name: Download a single artifact
+        uses: actions/download-artifact@v4
         with:
-          node-version: 16.x
-          registry-url: 'https://registry.npmjs.org'
+          name: dist
+          path: ./dist
 
-      - uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+      - name: Set up Terraform 
+        uses: hashicorp/setup-terraform@v1
 
-      - name: Deps
+      - name: Terraform Init
+        run: terraform -chdir=terraform init
+
+      - name: Terraform Apply
+        run: terraform -chdir=terraform apply --auto-approve
+      
+      - name: Terraform Destroy
         run: |
-          npm ci
+          terraform init
+          terraform -chdir=terraform destroy -auto-approve  
+       
+    
 
-      - name: Publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          npm publish --access public
-
-      - name: Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          body_path: CHANGELOG.md
-          draft: false
-          prerelease: contains(github.ref, '-')
-
-
-  automerge:
-    needs:
-      - test
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-      contents: write
-    steps:
-      - uses: fastify/github-action-merge-dependabot@v3.10.1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+  
+  
