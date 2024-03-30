@@ -91,7 +91,7 @@ jobs:
       #     terraform -chdir=terraform destroy -auto-approve  
       - id: eip_address
         run: | 
-            terraform-bin output eip_value |tr "\"" "\0" >ip
+            terraform-bin output ip_value |tr "\"" "\0" >ip
             echo ip=$(cat ip) >> "$GITHUB_OUTPUT" 
     
       - name: Download Artifact
