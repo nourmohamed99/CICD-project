@@ -103,7 +103,7 @@ jobs:
       - name: deploy copy to ec2
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ steps.ip_address.outputs.ip }}
+          host: ${{ steps.eip_address.outputs.ip }}
           username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
