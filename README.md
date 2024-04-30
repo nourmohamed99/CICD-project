@@ -62,7 +62,8 @@ Check this [Dockerfile](build/docker/Dockerfile).
 
 Run `make up` to spin up a local environment with **Docker Compose**.  
 Check this [docker-compose.yml](deployments/dev/docker-compose.yml) for more details.
-## CICD
+
+## CI/CD
 Continuous Integration (CI) and Deployment Pipeline for Node.js Application
 
 Implemented a robust CI/CD pipeline using GitHub Actions to automate the testing, building, and deployment process for a Node.js application hosted on AWS EC2 instances.
