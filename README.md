@@ -62,7 +62,19 @@ Check this [Dockerfile](build/docker/Dockerfile).
 
 Run `make up` to spin up a local environment with **Docker Compose**.  
 Check this [docker-compose.yml](deployments/dev/docker-compose.yml) for more details.
+## CICD
+Continuous Integration (CI) and Deployment Pipeline for Node.js Application
 
+Implemented a robust CI/CD pipeline using GitHub Actions to automate the testing, building, and deployment process for a Node.js application hosted on AWS EC2 instances.
+
+Key Responsibilities and Achievements:
+
+Configured a CI pipeline to run tests, perform code linting, and ensure code formatting on every push to the main branch.
+Leveraged GitHub Actions to automatically deploy the application to AWS EC2 instances upon successful tests and builds.
+Utilized Terraform for provisioning AWS infrastructure, including EC2 instances, ensuring infrastructure as code (IaC) principles.
+Orchestrated deployment tasks such as copying build artifacts to EC2 instances and executing necessary commands for application setup and launch using SSH.
+Ensured high availability and reliability of the application by deploying it behind an Nginx reverse proxy and managing the application process with PM2.
+This automated CI/CD pipeline significantly improved the development workflow, allowing for rapid and consistent delivery of new features and updates to the production environment.
 ## Tooling
 
 - ESM
